@@ -134,5 +134,37 @@ RSpec.describe 'merchants dashboard', type: :feature do
         expect(@invoice_6.created_at.strftime('%A, %B, %d, %Y')).to appear_before(@invoice_5.created_at.strftime('%A, %B, %d, %Y'))
       end
     end
+
+    # User Story Solo 1: Merchant Bulk Discounts Index
+    it 'shows a link to view all discounts that the merchant has available to customers' do
+      # As a merchant
+      # When I visit my merchant dashboard
+      visit dashboard_merchant_path(@merch_1)
+      # Then I see a link to view all my discounts
+      expect(page).to have_link("Bulk Discounts", href: => "/merchants/#{@merch_1.id}/bulk_discounts")
+      # When I click this link
+      click_link "Bulk Discounts"
+      # Then I am taken to my bulk discounts index page
+      expect(current_path).to eq("/merchants/#{@merch_1.id}/bulk_discounts")
+      # Where I see all of my bulk discounts including their
+      # percentage discount and quantity thresholds
+      # And each bulk discount listed includes a link to its show page
+      within ".bulk_discounts" do
+        within "#discount_#{@discount_1.id}" do
+          expect(page).to have_content("Discount ##{@discount_1.id}: Quantity - #{@discount_1.quantity_thresh}, Discount - #{@discount_1.percentage}%")
+          expect(page).to have_link("Discount ##{@discount_1.id}", href: => "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_1.id}")
+        end
+
+        within "#discount_#{@discount_1.id}" do
+          expect(page).to have_content("Discount ##{@discount_2.id}: Quantity - #{@discount_2.quantity_thresh}, Discount - #{@discount_2.percentage}%")
+          expect(page).to have_link("Discount ##{@discount_2.id}", href: => "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_2.id}")
+        end
+
+        within "#discount_#{@discount_1.id}" do
+          expect(page).to have_content("Discount ##{@discount_3.id}: Quantity - #{@discount_3.quantity_thresh}, Discount - #{@discount_3.percentage}%")
+          expect(page).to have_link("Discount ##{@discount_3.id}", href: => "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_3.id}")
+        end
+      end
+    end
   end
 end
