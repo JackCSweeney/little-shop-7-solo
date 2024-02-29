@@ -24,7 +24,11 @@ RSpec.describe 'merchants dashboard', type: :feature do
       @trans_5 = create(:transaction, invoice_id: @invoice_5.id)
       @trans_6 = create(:transaction, invoice_id: @invoice_6.id)
       
-      @merch_1 = create(:merchant, name: "Amazon") 
+      @merch_1 = create(:merchant, name: "Amazon")
+
+      @discount_1 = @merch_1.bulk_discounts.create!(percentage: 0.10, quantity_thresh: 10, merchant_id: @merch_1.id) 
+      @discount_2 = @merch_1.bulk_discounts.create!(percentage: 0.20, quantity_thresh: 15, merchant_id: @merch_1.id) 
+      @discount_3 = @merch_1.bulk_discounts.create!(percentage: 0.30, quantity_thresh: 20, merchant_id: @merch_1.id) 
 
       @item_1 = create(:item, unit_price: 1, merchant_id: @merch_1.id)
 
