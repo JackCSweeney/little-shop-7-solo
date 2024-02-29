@@ -5,4 +5,8 @@ class BulkDiscount < ApplicationRecord
 
   belongs_to :merchant
 
+  def display_percentage
+    (percentage * 100.0) 
+  end
+
 end
