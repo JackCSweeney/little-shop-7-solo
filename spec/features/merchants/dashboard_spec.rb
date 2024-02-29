@@ -153,20 +153,20 @@ RSpec.describe 'merchants dashboard', type: :feature do
       # Where I see all of my bulk discounts including their
       # percentage discount and quantity thresholds
       # And each bulk discount listed includes a link to its show page
-      within ".bulk_discounts" do
+      within "#bulk_discounts" do
         within "#discount_#{@discount_1.id}" do
-          expect(page).to have_content("Discount ##{@discount_1.id}: Quantity - #{@discount_1.quantity_thresh}, Discount - #{@discount_1.percentage}%")
-          expect(page).to have_link("Discount ##{@discount_1.id}", href: "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_1.id}")
+          expect(page).to have_content("Discount ##{@discount_1.id}: Quantity - #{@discount_1.quantity_thresh}, Discount - 10.0%")
+          expect(page).to have_link("Discount ##{@discount_1.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_1.id}")
         end
 
-        within "#discount_#{@discount_1.id}" do
-          expect(page).to have_content("Discount ##{@discount_2.id}: Quantity - #{@discount_2.quantity_thresh}, Discount - #{@discount_2.percentage}%")
-          expect(page).to have_link("Discount ##{@discount_2.id}", href: "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_2.id}")
+        within "#discount_#{@discount_2.id}" do
+          expect(page).to have_content("Discount ##{@discount_2.id}: Quantity - #{@discount_2.quantity_thresh}, Discount - 20.0%")
+          expect(page).to have_link("Discount ##{@discount_2.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_2.id}")
         end
 
-        within "#discount_#{@discount_1.id}" do
-          expect(page).to have_content("Discount ##{@discount_3.id}: Quantity - #{@discount_3.quantity_thresh}, Discount - #{@discount_3.percentage}%")
-          expect(page).to have_link("Discount ##{@discount_3.id}", href: "/merchants/#{merch_1.id}/bulk_discounts/#{@discount_3.id}")
+        within "#discount_#{@discount_3.id}" do
+          expect(page).to have_content("Discount ##{@discount_3.id}: Quantity - #{@discount_3.quantity_thresh}, Discount - 30.0%")
+          expect(page).to have_link("Discount ##{@discount_3.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_3.id}")
         end
       end
     end

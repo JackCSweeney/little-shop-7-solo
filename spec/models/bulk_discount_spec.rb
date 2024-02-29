@@ -21,9 +21,9 @@ RSpec.describe BulkDiscount, type: :model do
   describe 'instance methods' do
     describe '#display_percentage' do
       it 'formats the decimal percentage to a percentage' do
-        expect(@discount_1.display_percentage).to eq(10.0)
-        expect(@discount_2.display_percentage).to eq(20.0)
-        expect(@discount_3.display_percentage).to eq(30.0)
+        expect(@discount_1.display_percentage).to eq(10)
+        expect(@discount_2.display_percentage).to eq(20)
+        expect(@discount_3.display_percentage).to eq(30)
       end
     end
   end
