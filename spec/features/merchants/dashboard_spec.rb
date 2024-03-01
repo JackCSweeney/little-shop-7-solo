@@ -24,7 +24,11 @@ RSpec.describe 'merchants dashboard', type: :feature do
       @trans_5 = create(:transaction, invoice_id: @invoice_5.id)
       @trans_6 = create(:transaction, invoice_id: @invoice_6.id)
       
-      @merch_1 = create(:merchant, name: "Amazon") 
+      @merch_1 = create(:merchant, name: "Amazon")
+
+      @discount_1 = @merch_1.bulk_discounts.create!(percentage: 0.10, quantity_thresh: 10, merchant_id: @merch_1.id) 
+      @discount_2 = @merch_1.bulk_discounts.create!(percentage: 0.20, quantity_thresh: 15, merchant_id: @merch_1.id) 
+      @discount_3 = @merch_1.bulk_discounts.create!(percentage: 0.30, quantity_thresh: 20, merchant_id: @merch_1.id) 
 
       @item_1 = create(:item, unit_price: 1, merchant_id: @merch_1.id)
 
@@ -132,6 +136,38 @@ RSpec.describe 'merchants dashboard', type: :feature do
         end
 
         expect(@invoice_6.created_at.strftime('%A, %B, %d, %Y')).to appear_before(@invoice_5.created_at.strftime('%A, %B, %d, %Y'))
+      end
+    end
+
+    # User Story Solo 1: Merchant Bulk Discounts Index
+    it 'shows a link to view all discounts that the merchant has available to customers' do
+      # As a merchant
+      # When I visit my merchant dashboard
+      visit dashboard_merchant_path(@merch_1)
+      # Then I see a link to view all my discounts
+      expect(page).to have_link("Bulk Discounts", href: merchant_bulk_discounts_path(@merch_1))
+      # When I click this link
+      click_link "Bulk Discounts"
+      # Then I am taken to my bulk discounts index page
+      expect(current_path).to eq(merchant_bulk_discounts_path(@merch_1))
+      # Where I see all of my bulk discounts including their
+      # percentage discount and quantity thresholds
+      # And each bulk discount listed includes a link to its show page
+      within "#bulk_discounts" do
+        within "#discount_#{@discount_1.id}" do
+          expect(page).to have_content("Discount ##{@discount_1.id}: Quantity - #{@discount_1.quantity_thresh}, Discount - 10.0%")
+          expect(page).to have_link("Discount ##{@discount_1.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_1.id}")
+        end
+
+        within "#discount_#{@discount_2.id}" do
+          expect(page).to have_content("Discount ##{@discount_2.id}: Quantity - #{@discount_2.quantity_thresh}, Discount - 20.0%")
+          expect(page).to have_link("Discount ##{@discount_2.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_2.id}")
+        end
+
+        within "#discount_#{@discount_3.id}" do
+          expect(page).to have_content("Discount ##{@discount_3.id}: Quantity - #{@discount_3.quantity_thresh}, Discount - 30.0%")
+          expect(page).to have_link("Discount ##{@discount_3.id}", href: "/merchants/#{@merch_1.id}/bulk_discounts/#{@discount_3.id}")
+        end
       end
     end
   end
