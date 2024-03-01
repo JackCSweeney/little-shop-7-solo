@@ -19,5 +19,29 @@ RSpec.describe 'Merchant Bulk Discount Show Page', type: :feature do
       expect(page).to have_content("Quantity Threshold - #{@discount_1.quantity_thresh}")
       expect(page).to have_content("Percentage - 10.0%")
     end
+
+    # User Story Solo 5: Merchant Bulk Discount Edit
+    it 'shows a link to edit a bulk discount from the show page and when clicked, takes you to an edit page where all the previous information is populated, when subitted, takes you back to the show page and shows the newly edited attributes' do
+      # As a merchant, when I visit my bulk discount show page
+      visit merchant_bulk_discount_path(@merch_1, @discount_1)
+      # Then I see a link to edit the bulk discount
+      expect(page).to have_link("Edit Discount", href: edit_merchant_bulk_discount_path(@discount_1))
+      # When I click this link
+      click_link("Edit Discount")
+      # Then I am taken to a new page with a form to edit the discount
+      expect(current_path).to eq(edit_merchant_bulk_discount_path(@discount_1))
+      # And I see that the discounts current attributes are pre-poluated in the form
+      expect(page).to have_content(@discount_1.quantity_thresh)
+      expect(page).to have_content(@discount_1.percentage)
+      expect(page).to have_field("quantity_thresh")
+      expect(page).to have_field("percentage")
+      # When I change any/all of the information and click submit
+      fill_in("percentage", with: 0.80)
+      click_on "submit"
+      # Then I am redirected to the bulk discount's show page
+      expect(current_path).to eq(merchant_bulk_discount_path(@merch_1, @discount_1))
+      # And I see that the discount's attributes have been updated
+      expect(page).to have_content("Percentage - 80%")
+    end
   end
 end
