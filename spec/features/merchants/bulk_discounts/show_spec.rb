@@ -25,23 +25,35 @@ RSpec.describe 'Merchant Bulk Discount Show Page', type: :feature do
       # As a merchant, when I visit my bulk discount show page
       visit merchant_bulk_discount_path(@merch_1, @discount_1)
       # Then I see a link to edit the bulk discount
-      expect(page).to have_link("Edit Discount", href: edit_merchant_bulk_discount_path(@discount_1))
+      expect(page).to have_link("Edit Discount", href: edit_merchant_bulk_discount_path(@merch_1, @discount_1))
       # When I click this link
       click_link("Edit Discount")
       # Then I am taken to a new page with a form to edit the discount
-      expect(current_path).to eq(edit_merchant_bulk_discount_path(@discount_1))
+      expect(current_path).to eq(edit_merchant_bulk_discount_path(@merch_1, @discount_1))
       # And I see that the discounts current attributes are pre-poluated in the form
-      expect(page).to have_content(@discount_1.quantity_thresh)
-      expect(page).to have_content(@discount_1.percentage)
-      expect(page).to have_field("quantity_thresh")
-      expect(page).to have_field("percentage")
+      expect(page).to have_field("quantity_thresh", with: 10)
+      expect(page).to have_field("percentage", with: 0.10)
       # When I change any/all of the information and click submit
       fill_in("percentage", with: 0.80)
-      click_on "submit"
+      click_on "Save"
       # Then I am redirected to the bulk discount's show page
       expect(current_path).to eq(merchant_bulk_discount_path(@merch_1, @discount_1))
       # And I see that the discount's attributes have been updated
-      expect(page).to have_content("Percentage - 80%")
+      expect(page).to have_content("Percentage - 80.0%")
+    end
+
+    it 'has a sad path flash message for empty fields' do
+      visit edit_merchant_bulk_discount_path(@merch_1, @discount_1)
+
+      fill_in("quantity_thresh", with: 15)
+      fill_in("percentage", with: "")
+      click_on "Save"
+      
+      within "#flash" do
+        expect(page).to have_content("Error: Percentage can't be blank")
+      end
+      expect(page).to have_field("quantity_thresh")
+      expect(page).to have_field("percentage")
     end
   end
 end
