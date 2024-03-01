@@ -32,10 +32,10 @@ RSpec.describe 'Merchant Bulk Discounts Index', type: :feature do
         within "#discount_#{@discount_1.id}" do
           click_on "Delete"
         end
-
-        expect(page).not_to have_content("Discount ##{@discount_1.id}")
       end
       # And I no longer see the discount listed      
+      expect(page).not_to have_content("Discount ##{@discount_1.id}")
     end
+
   end
 end

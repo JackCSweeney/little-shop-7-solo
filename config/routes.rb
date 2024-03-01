@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     member { get "dashboard" }
     resources :items, controller: 'merchant_items', only: [:index, :show, :edit, :update, :new, :create]
     resources :invoices, controller: 'merchant_invoices', only: [:index, :show]
-    resources :bulk_discounts, only: [:index, :show, :new, :create]
+    resources :bulk_discounts, only: [:index, :show, :new, :create, :destroy]
   end
   
   get "/", to: "welcome#index"

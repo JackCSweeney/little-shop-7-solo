@@ -29,7 +29,8 @@ RSpec.describe 'Merchant Bulk Discounts New Page', type: :feature do
       end
     end
 
-    it 'has a sad path flash message' do
+    # add sad path for percentage being 100% or higher as invalid
+    it 'has a sad path flash message for empty fields' do
       visit new_merchant_bulk_discount_path(@merch_1)
 
       fill_in("quantity_thresh", with: 15)

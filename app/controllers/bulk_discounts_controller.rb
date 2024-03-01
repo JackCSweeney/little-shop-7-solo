@@ -23,10 +23,14 @@ class BulkDiscountsController < ApplicationController
     end
   end
 
+  def destroy
+    BulkDiscount.find(bulk_discount_params[:id]).destroy
+  end
+
   private
 
   def bulk_discount_params
-    params.permit(:quantity_thresh, :percentage, :merchant_id)
+    params.permit(:quantity_thresh, :percentage, :merchant_id, :id)
   end
 
 end
