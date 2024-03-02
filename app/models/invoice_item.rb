@@ -11,4 +11,8 @@ class InvoiceItem < ApplicationRecord
   def unit_price_to_dollars
     unit_price/100.00
   end
+
+  def best_discount
+    BulkDiscount.select("bulk_discounts.*").where("bulk_discounts.quantity_thresh <= #{self.quantity}").order("bulk_discounts.percentage DESC").first
+  end
 end
