@@ -145,7 +145,13 @@ RSpec.describe 'merchant invoice show', type: :feature do
       # As a merchant, when I visit my merchant invoice show page
       visit merchant_invoice_path(@merch_1, @invoice_7)
       # Next to each invoice item I see a link to the show page for the bulk discount that was applied (if any)
-      expect(page).to have_link("Discount", href: merchant_bulk_discount_path(@merch_1, (@merch_1.bulk_discounts.first)))
+      within "#item-#{@item_1.id}" do
+        expect(page).to have_link("Discount", href: merchant_bulk_discount_path(@merch_1, (@merch_1.bulk_discounts.first)))
+      end
+
+      within "#item-#{@item_4.id}" do
+        expect(page).not_to have_link("Discount", href: merchant_bulk_discount_path(@merch_1, (@merch_1.bulk_discounts.first)))
+      end
     end
   end 
 end
