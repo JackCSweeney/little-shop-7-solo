@@ -78,7 +78,7 @@ RSpec.describe Invoice, type: :model do
     @invoice_item_11 = create(:invoice_item, item_id: @item_6.id, invoice_id: @invoice_10.id, quantity: 4, unit_price: 100, status: 2)
     @invoice_item_12 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_11.id, quantity: 20, unit_price: 100, status: 2)
     @invoice_item_13 = create(:invoice_item, item_id: @item_6.id, invoice_id: @invoice_11.id, quantity: 10, unit_price: 100, status: 2)
-    @invoice_item_14 = create(:invoice_item, item_id: @item_7.id, invoice_id: @invoice_10.id, quantity: 10, unit_price: 100, status: 2)
+    @invoice_item_14 = create(:invoice_item, item_id: @item_7.id, invoice_id: @invoice_10.id, quantity: 5, unit_price: 100, status: 2)
   end
 
   describe 'Class Methods' do
@@ -126,11 +126,11 @@ RSpec.describe Invoice, type: :model do
       it 'returns the total discounted revenue with the best bulk discount available applied' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
-        expect(@invoice_10.total_revenue_of_discounted_items).to eq(900)
+        expect(@invoice_10.total_revenue_of_discounted_items(@merchant_1)).to eq(900)
 
         @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
         
-        expect(@invoice_11.total_revenue_of_discounted_items).to eq(2400)
+        expect(@invoice_11.total_revenue_of_discounted_items(@merchant_1)).to eq(2400)
       end
     end
 
@@ -138,19 +138,20 @@ RSpec.describe Invoice, type: :model do
       it 'returns the total non-discounted revenue dollars that a given merchant will make off of one invoice' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
-        expect(@invoice_10.total_non_discount_merchant_invoice_revenue).to eq(400)
+        expect(@invoice_10.total_non_discount_merchant_invoice_revenue(@merchant_1)).to eq(400)
       end
     end
 
     describe '#total_discounted_merchant_revenue' do
       it 'returns the total revenue with discounted and non-discounted items included for the merchant with the discounts' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+        @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
 
-        expect(@invoice_10.total_discounted_merchant_revenue).to eq(13.0)
+        expect(@invoice_10.total_discounted_merchant_revenue(@merchant_1)).to eq(13.0)
 
         @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
         
-        expect(@invoice_11.total_discounted_merchant_revenue).to eq(34.0)
+        expect(@invoice_11.total_discounted_merchant_revenue(@merchant_1)).to eq(34.0)
       end
     end
 
