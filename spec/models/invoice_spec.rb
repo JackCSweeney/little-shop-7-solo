@@ -35,6 +35,8 @@ RSpec.describe Invoice, type: :model do
     @invoice_7 = create(:invoice, customer_id: @customer_5.id, status: 0, created_at: "Wed, 21 Feb 2024 00:47:11.096539000 UTC +00:00")
     @invoice_8 = create(:invoice, customer_id: @customer_5.id, status: 0, created_at: "Tues, 20 Feb 2024 00:47:11.096539000 UTC +00:00")
     @invoice_9 = create(:invoice, customer_id: @customer_5.id, status: 0, created_at: "Mon, 19 Feb 2024 00:47:11.096539000 UTC +00:00")
+    @invoice_10 = create(:invoice, customer_id: @customer_5.id)
+    @invoice_11 = create(:invoice, customer_id: @customer_5.id)
 
     @trans_1 = create(:transaction, invoice_id: @invoice_1.id)
     @trans_2 = create(:transaction, invoice_id: @invoice_1.id)
@@ -53,6 +55,7 @@ RSpec.describe Invoice, type: :model do
     @trans_15 = create(:transaction, invoice_id: @invoice_5.id)
     
     @merchant_1 = create(:merchant, name: "Amazon") 
+    @merchant_2 = create(:merchant, name: "Greg") 
 
     @item_1 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
     @item_2 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
@@ -60,6 +63,7 @@ RSpec.describe Invoice, type: :model do
     @item_4 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
     @item_5 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
     @item_6 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
+    @item_7 = create(:item, unit_price: 1, merchant_id: @merchant_2.id)
 
     @invoice_item_1 = create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_1.id, quantity: 1, unit_price: 1300, status: 0)
     @invoice_item_2 = create(:invoice_item, item_id: @item_2.id, invoice_id: @invoice_2.id, quantity: 1, unit_price: 1300, status: 0)
@@ -70,6 +74,11 @@ RSpec.describe Invoice, type: :model do
     @invoice_item_7 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_8.id, quantity: 1, unit_price: 1300, status: 0)
     @invoice_item_8 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_9.id, quantity: 1, unit_price: 1300, status: 0)
     @invoice_item_9 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_1.id, quantity: 4, unit_price: 5500, status: 2)
+    @invoice_item_10 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_10.id, quantity: 10, unit_price: 100, status: 2)
+    @invoice_item_11 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_10.id, quantity: 4, unit_price: 100, status: 2)
+    @invoice_item_12 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_11.id, quantity: 20, unit_price: 100, status: 2)
+    @invoice_item_13 = create(:invoice_item, item_id: @item_6.id, invoice_id: @invoice_11.id, quantity: 10, unit_price: 100, status: 2)
+    @invoice_item_14 = create(:invoice_item, item_id: @item_7.id, invoice_id: @invoice_10.id, quantity: 10, unit_price: 100, status: 2)
   end
 
   describe 'Class Methods' do
@@ -110,6 +119,38 @@ RSpec.describe Invoice, type: :model do
       it "returns the correct revenue that an invoice will generate" do
         expect(@invoice_1.total_revenue_dollars).to eq(233.00)
         expect(@invoice_2.total_revenue_dollars).to eq(13.00)
+      end
+    end
+
+    describe '#total_revenue_of_discounted_items' do
+      it 'returns the total discounted revenue with the best bulk discount available applied' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+
+        expect(@invoice_10.total_revenue_of_discounted_items).to eq(900)
+
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
+        
+        expect(@invoice_11.total_revenue_of_discounted_items).to eq(2400)
+      end
+    end
+
+    describe '#total_non_discount_merchant_invoice_revenue' do
+      it 'returns the total non-discounted revenue dollars that a given merchant will make off of one invoice' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+
+        expect(@invoice_10.total_non_discount_merchant_invoice_revenue).to eq(400)
+      end
+    end
+
+    describe '#total_discounted_merchant_revenue' do
+      it 'returns the total revenue with discounted and non-discounted items included for the merchant with the discounts' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+
+        expect(@invoice_10.total_discounted_merchant_revenue).to eq(1300)
+
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
+        
+        expect(@invoice_11.total_revenue_of_discounted_items).to eq(2400)
       end
     end
   end
