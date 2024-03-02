@@ -28,11 +28,11 @@ class Invoice < ApplicationRecord
   end
   
   def total_revenue
-    self.invoice_items.sum("unit_price * quantity")
+    self.invoice_items.sum("unit_price * quantity")/100.00
   end
 
   def total_revenue_of_discounted_items
-    x = bulk_discounts
+    x = bulk_discounts.distinct
     .where("invoice_items.quantity >= bulk_discounts.quantity_thresh")
     .select("MIN(invoice_items.unit_price - (invoice_items.unit_price * bulk_discounts.percentage)) * invoice_items.quantity AS discounted_price, invoice_items.item_id")
     .group("invoice_items.quantity, item_id")
@@ -44,12 +44,15 @@ class Invoice < ApplicationRecord
 
   def total_non_discount_merchant_invoice_revenue
     bulk_discounts
-    .where("invoice_items.quantity < bulk_discounts.quantity_thresh")
-    .sum("invoice_items.unit_price * invoice_items.quantity")
+    .select("SUM(invoice_items.unit_price * invoice_items.quantity), MIN(bulk_discounts.quantity_thresh)")
+    .where("invoice_items.quantity < bulk_discounts.quantity_thresh AND #{self.id} = invoice_items.invoice_id")
+    .group("bulk_discounts.id")
+    .first
+    .sum
   end
 
   def total_discounted_merchant_revenue
-    total_revenue_of_discounted_items + total_non_discount_merchant_invoice_revenue
+    x = (total_revenue_of_discounted_items + total_non_discount_merchant_invoice_revenue) / 100.0
   end
 
 

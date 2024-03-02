@@ -109,7 +109,7 @@ RSpec.describe Invoice, type: :model do
     describe '#total_revenue' do
       it "returns the total revenue of the invoice item" do
         expect(@invoice_6.total_revenue).to eq(0)
-        expect(@invoice_1.total_revenue).to eq(23300)
+        expect(@invoice_1.total_revenue).to eq(233.0)
       end
     end
   end
@@ -146,11 +146,11 @@ RSpec.describe Invoice, type: :model do
       it 'returns the total revenue with discounted and non-discounted items included for the merchant with the discounts' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
-        expect(@invoice_10.total_discounted_merchant_revenue).to eq(1300)
+        expect(@invoice_10.total_discounted_merchant_revenue).to eq(13.0)
 
         @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
         
-        expect(@invoice_11.total_revenue_of_discounted_items).to eq(2400)
+        expect(@invoice_11.total_discounted_merchant_revenue).to eq(34.0)
       end
     end
   end

@@ -40,8 +40,8 @@ RSpec.describe 'merchant invoice show', type: :feature do
       create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_4.id, unit_price: 1, quantity: 50, status: 2)
       create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_5.id, unit_price: 1, quantity: 40)
       create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_6.id, unit_price: 1, quantity: 5)
-      @invoice_item_1 = create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_7.id, unit_price: 10, quantity: 10)
-      @invoice_item_2 = create(:invoice_item, item_id: @item_4.id, invoice_id: @invoice_7.id, unit_price: 10, quantity: 3)
+      @invoice_item_1 = create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_7.id, unit_price: 100, quantity: 10)
+      @invoice_item_2 = create(:invoice_item, item_id: @item_4.id, invoice_id: @invoice_7.id, unit_price: 100, quantity: 3)
     end
 
    
@@ -135,9 +135,8 @@ RSpec.describe 'merchant invoice show', type: :feature do
       visit merchant_invoice_path(@merch_1, @invoice_7)
       # Then I see the total revenue for my merchant from this invoice (not including discounts)
       expect(page).to have_content("Total Revenue: $#{@invoice_7.total_revenue_dollars}")
-      save_and_open_page
       # And I see the total discounted revenue for my merchant from this invoice which includes bulk discounts in the calculation
-      expect(page).to have_content("Total Discounted Revenue: $#{@invoice_7.bulk_discount_revenue}")
+      expect(page).to have_content("Total Discounted Revenue: $12.0")
     end
   end 
 end
