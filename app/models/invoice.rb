@@ -55,5 +55,9 @@ class Invoice < ApplicationRecord
     x = (total_revenue_of_discounted_items + total_non_discount_merchant_invoice_revenue) / 100.0
   end
 
+  def merchant_invoice_items(merchant)
+    items.where("items.merchant_id = #{merchant.id}")
+  end
+
 
 end

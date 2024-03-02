@@ -10,7 +10,7 @@
 </section>
 
 <section class="invoice-items">
-  <% @invoice.items.each do |item| %>
+  <% @invoice.merchant_invoice_items(@merchant).each do |item| %>
   <div id="item-<%= item.id %>">
     <h3><%= item.name %></h3>
     <p>Quantity: <%= item.current_invoice_item(item, @invoice).quantity %></p>

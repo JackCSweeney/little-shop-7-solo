@@ -134,9 +134,18 @@ RSpec.describe 'merchant invoice show', type: :feature do
       # When I visit my merchant invoice show page
       visit merchant_invoice_path(@merch_1, @invoice_7)
       # Then I see the total revenue for my merchant from this invoice (not including discounts)
-      expect(page).to have_content("Total Revenue: $#{@invoice_7.total_revenue_dollars}")
+      expect(page).to have_content("Total Revenue: $13.0")
       # And I see the total discounted revenue for my merchant from this invoice which includes bulk discounts in the calculation
       expect(page).to have_content("Total Discounted Revenue: $12.0")
+    end
+
+    # User story solo 7: Merchant Invoice Show Page: Link to applied discounts
+    it 'shows a link to the bulk discount show page if any were applied to the invoice' do
+      @merch_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+      # As a merchant, when I visit my merchant invoice show page
+      visit merchant_invoice_path(@merch_1, @invoice_7)
+      # Next to each invoice item I see a link to the show page for the bulk discount that was applied (if any)
+      expect(page).to have_link("Discount", href: merchant_bulk_discount_path(@merch_1, (@merch_1.bulk_discounts.first)))
     end
   end 
 end
