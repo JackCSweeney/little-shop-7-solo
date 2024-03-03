@@ -105,16 +105,17 @@ RSpec.describe Invoice, type: :model do
         expect(Invoice.invoices_with_unshipped_items_oldest_to_newest).to eq([@invoice_9, @invoice_8, @invoice_7, @invoice_1, @invoice_2, @invoice_3])
       end
     end
-
-    describe '#total_revenue' do
-      it "returns the total revenue of the invoice item" do
-        expect(@invoice_6.total_revenue).to eq(0)
-        expect(@invoice_1.total_revenue).to eq(233.0)
-      end
-    end
   end
 
   describe "#Instance Methods" do
+    describe '#total_merchant_revenue(merchant)' do
+        it "returns the total revenue of the invoice item" do
+          expect(@invoice_10.total_merchant_revenue(@merchant_1)).to eq(14.0)
+          expect(@invoice_10.total_merchant_revenue(@merchant_2)).to eq(5.0)
+          expect(@invoice_1.total_merchant_revenue(@merchant_1)).to eq(233.0)
+        end
+      end
+
     describe "#total_revenue_dollars" do
       it "returns the correct revenue that an invoice will generate" do
         expect(@invoice_1.total_revenue_dollars).to eq(233.00)

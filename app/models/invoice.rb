@@ -27,8 +27,8 @@ class Invoice < ApplicationRecord
     invoice_items.sum("quantity * unit_price")/100.00
   end
   
-  def total_revenue
-    self.invoice_items.sum("unit_price * quantity")/100.00
+  def total_merchant_revenue(merchant)
+    self.items.where("items.merchant_id = #{merchant.id}").sum("invoice_items.unit_price * invoice_items.quantity")/100.00
   end
 
   def total_revenue_of_discounted_items(merchant)
