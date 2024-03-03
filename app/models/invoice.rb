@@ -59,6 +59,4 @@ class Invoice < ApplicationRecord
     items.where("items.merchant_id = #{merchant.id}")
   end
 
-  # need to fix the methods above to only calculate based off of a single merchant
-
 end

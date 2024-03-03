@@ -17,6 +17,8 @@ RSpec.describe 'Admin Index Show', type: :feature do
       @merchant_4 = create(:merchant, name: "Microsoft", status: 0) 
 
       @item_1 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
+      @item_2 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
+      @item_3 = create(:item, unit_price: 1, merchant_id: @merchant_4.id)
       @item_8 = create(:item, unit_price: 1, merchant_id: @merchant_4.id)
 
       @invoice_item_1 = create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_1.id, quantity: 1, unit_price: 1300, status: 0)
@@ -98,6 +100,21 @@ RSpec.describe 'Admin Index Show', type: :feature do
         # And I see that my Invoice's status has now been updated
         expect(page).to have_content("Cancelled")
       end
+    end
+
+    # User story solo 8: Admin Invoice Show Page: Total Revenue and Discounted Revenue
+    it 'displays the total revenue across all merchants and the total revenue after merchant specific discounts have been applied to the invoice items' do
+      invoice_item_2 = create(:invoice_item, item_id: @item_2.id, invoice_id: @invoice_1.id, quantity: 1, unit_price: 5500, status: 2)
+      invoice_item_3 = create(:invoice_item, item_id: @item_3.id, invoice_id: @invoice_1.id, quantity: 10, unit_price: 1000, status: 2)
+
+      @merchant_4.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+
+      # As an admin, when I visit an admin invoice show page
+      visit admin_invoice_path(@invoice_1)
+      # Then I see the total revenue from this invoice (not including discounts)
+      expect(page).to have_content("Total Revenue: $388.0")
+      # And I see the total discounted revenue from this invoice which includes bulk discounts in the calculation
+      expect(page).to have_content("Total Discounted Revenue: $378.0")
     end
   end
 end
