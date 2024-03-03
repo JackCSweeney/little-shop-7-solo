@@ -14,12 +14,6 @@ class Merchant < ApplicationRecord
 
   def top_five_cust
     customers.top_five_customers
-    # customers.joins(invoices: [:transactions]) #what tables do we need
-    #   .where(transactions: { result: 0 })# are there conditions for the data I want back
-    #   .select("customers.*, CONCAT(customers.first_name, ' ', customers.last_name) AS full_name, COUNT(transactions.id) as successful_transactions") #select is what I want back
-    #   .group('customers.id') #how do I want to organize the data
-    #   .order("successful_transactions DESC")  #how the group will be returned
-    #   .limit(5) #how many 
   end
 
   def not_shipped_invoices  
