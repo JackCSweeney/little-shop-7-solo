@@ -31,7 +31,7 @@ class Invoice < ApplicationRecord
     self.items.where("items.merchant_id = #{merchant.id}").sum("invoice_items.unit_price * invoice_items.quantity")/100.00
   end
 
-  def total_revenue_of_discounted_items(merchant)
+  def total_discounted_merchant_invoice_items(merchant)
     x = bulk_discounts.distinct
     .where("invoice_items.quantity >= bulk_discounts.quantity_thresh AND invoice_items.item_id = items.id AND items.merchant_id = #{merchant.id}")
     .select("MIN(invoice_items.unit_price - (invoice_items.unit_price * bulk_discounts.percentage)) * invoice_items.quantity AS discounted_price, invoice_items.item_id")
@@ -52,11 +52,35 @@ class Invoice < ApplicationRecord
   end
 
   def total_discounted_merchant_revenue(merchant)
-    (total_revenue_of_discounted_items(merchant) + total_non_discount_merchant_invoice_revenue(merchant)) / 100.0
+    (total_discounted_merchant_invoice_items(merchant) + total_non_discount_merchant_invoice_revenue(merchant)) / 100.0
   end
 
   def merchant_invoice_items(merchant)
     items.where("items.merchant_id = #{merchant.id}")
   end
 
+
+  def discounted_invoice_items_revenue
+    x = bulk_discounts.distinct
+    .where("invoice_items.quantity >= bulk_discounts.quantity_thresh AND invoice_items.item_id = items.id AND items.merchant_id = merchants.id")
+    .select("MIN(invoice_items.unit_price - (invoice_items.unit_price * bulk_discounts.percentage)) * invoice_items.quantity AS discounted_price, invoice_items.item_id")
+    .group("invoice_items.quantity, item_id")
+
+    x.sum do |discounted_item_total|
+      discounted_item_total.discounted_price
+    end
+  end
+
+  def non_discount_total_invoice_revenue
+    bulk_discounts
+    .select("SUM(invoice_items.unit_price * invoice_items.quantity), MIN(bulk_discounts.quantity_thresh)")
+    .where("invoice_items.quantity < bulk_discounts.quantity_thresh AND #{self.id} = invoice_items.invoice_id AND invoice_items.item_id = items.id AND items.merchant_id = merchants.id")
+    .group("bulk_discounts.id")
+    .first
+    .sum
+  end
+
+  def total_invoice_revenue_after_discount
+    (non_discount_total_invoice_revenue + discounted_invoice_items_revenue) / 100.0
+  end
 end

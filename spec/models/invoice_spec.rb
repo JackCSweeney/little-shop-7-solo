@@ -123,15 +123,15 @@ RSpec.describe Invoice, type: :model do
       end
     end
 
-    describe '#total_revenue_of_discounted_items' do
+    describe '#total_discounted_merchant_invoice_items(merchant)' do
       it 'returns the total discounted revenue with the best bulk discount available applied' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
-        expect(@invoice_10.total_revenue_of_discounted_items(@merchant_1)).to eq(900)
+        expect(@invoice_10.total_discounted_merchant_invoice_items(@merchant_1)).to eq(900)
 
         @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
         
-        expect(@invoice_11.total_revenue_of_discounted_items(@merchant_1)).to eq(2400)
+        expect(@invoice_11.total_discounted_merchant_invoice_items(@merchant_1)).to eq(2400)
       end
     end
 
@@ -143,7 +143,7 @@ RSpec.describe Invoice, type: :model do
       end
     end
 
-    describe '#total_discounted_merchant_revenue' do
+    describe '#total_discounted_merchant_revenue(merchant)' do
       it 'returns the total revenue with discounted and non-discounted items included for the merchant with the discounts' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
         @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
@@ -160,6 +160,40 @@ RSpec.describe Invoice, type: :model do
       it 'only returns items from an invoice that belong to the given merchant' do
         expect(@invoice_10.merchant_invoice_items(@merchant_1)).to match_array([@item_5, @item_6])
         expect(@invoice_11.merchant_invoice_items(@merchant_1)).to match_array([@item_5, @item_6])
+      end
+    end
+
+    describe '#total_invoice_revenue_after_discount' do
+      it 'returns the total revenue of an invoice including any discounts from all merchants included on an invoice' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+        @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
+
+        expect(@invoice_10.total_invoice_revenue_after_discount).to eq(17.5)
+
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
+        
+        expect(@invoice_11.total_invoice_revenue_after_discount).to eq(34.0)
+      end
+    end
+
+    describe '#discounted_invoice_items_revenue' do
+      it 'returns the total revenue from just discounted items for the invoice from all merchants with discounts' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+        @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
+
+        expect(@invoice_10.discounted_invoice_items_revenue).to eq(1350.0)
+
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
+        
+        expect(@invoice_11.discounted_invoice_items_revenue).to eq(2400)
+      end
+    end
+
+    describe '#non_discount_total_invoice_revenue' do
+      it 'returns the total revenue for all items on an invoice that do not have a discount available for them' do
+        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
+
+        expect(@invoice_10.non_discount_total_invoice_revenue).to eq(400)
       end
     end
   end
