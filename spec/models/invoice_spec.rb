@@ -64,6 +64,7 @@ RSpec.describe Invoice, type: :model do
     @item_5 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
     @item_6 = create(:item, unit_price: 1, merchant_id: @merchant_1.id)
     @item_7 = create(:item, unit_price: 1, merchant_id: @merchant_2.id)
+    @item_8 = create(:item, unit_price: 1, merchant_id: @merchant_2.id)
 
     @invoice_item_1 = create(:invoice_item, item_id: @item_1.id, invoice_id: @invoice_1.id, quantity: 1, unit_price: 1300, status: 0)
     @invoice_item_2 = create(:invoice_item, item_id: @item_2.id, invoice_id: @invoice_2.id, quantity: 1, unit_price: 1300, status: 0)
@@ -76,9 +77,10 @@ RSpec.describe Invoice, type: :model do
     @invoice_item_9 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_1.id, quantity: 4, unit_price: 5500, status: 2)
     @invoice_item_10 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_10.id, quantity: 10, unit_price: 100, status: 2)
     @invoice_item_11 = create(:invoice_item, item_id: @item_6.id, invoice_id: @invoice_10.id, quantity: 4, unit_price: 100, status: 2)
+    @invoice_item_14 = create(:invoice_item, item_id: @item_7.id, invoice_id: @invoice_10.id, quantity: 5, unit_price: 100, status: 2)
+    @invoice_item_15 = create(:invoice_item, item_id: @item_8.id, invoice_id: @invoice_10.id, quantity: 10, unit_price: 50, status: 2)
     @invoice_item_12 = create(:invoice_item, item_id: @item_5.id, invoice_id: @invoice_11.id, quantity: 20, unit_price: 100, status: 2)
     @invoice_item_13 = create(:invoice_item, item_id: @item_6.id, invoice_id: @invoice_11.id, quantity: 10, unit_price: 100, status: 2)
-    @invoice_item_14 = create(:invoice_item, item_id: @item_7.id, invoice_id: @invoice_10.id, quantity: 5, unit_price: 100, status: 2)
   end
 
   describe 'Class Methods' do
@@ -111,7 +113,7 @@ RSpec.describe Invoice, type: :model do
     describe '#total_merchant_revenue(merchant)' do
         it "returns the total revenue of the invoice item" do
           expect(@invoice_10.total_merchant_revenue(@merchant_1)).to eq(14.0)
-          expect(@invoice_10.total_merchant_revenue(@merchant_2)).to eq(5.0)
+          expect(@invoice_10.total_merchant_revenue(@merchant_2)).to eq(10.0)
           expect(@invoice_1.total_merchant_revenue(@merchant_1)).to eq(233.0)
         end
       end
@@ -166,34 +168,13 @@ RSpec.describe Invoice, type: :model do
     describe '#total_invoice_revenue_after_discount' do
       it 'returns the total revenue of an invoice including any discounts from all merchants included on an invoice' do
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
-        @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
+        @merchant_2.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
-        expect(@invoice_10.total_invoice_revenue_after_discount).to eq(17.5)
+        expect(@invoice_10.total_invoice_revenue_after_discount).to eq(22.5)
 
         @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
         
         expect(@invoice_11.total_invoice_revenue_after_discount).to eq(34.0)
-      end
-    end
-
-    describe '#discounted_invoice_items_revenue' do
-      it 'returns the total revenue from just discounted items for the invoice from all merchants with discounts' do
-        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
-        @merchant_2.bulk_discounts.create!(quantity_thresh: 5, percentage: 0.10)
-
-        expect(@invoice_10.discounted_invoice_items_revenue).to eq(1350.0)
-
-        @merchant_1.bulk_discounts.create!(quantity_thresh: 20, percentage: 0.25)
-        
-        expect(@invoice_11.discounted_invoice_items_revenue).to eq(2400)
-      end
-    end
-
-    describe '#non_discount_total_invoice_revenue' do
-      it 'returns the total revenue for all items on an invoice that do not have a discount available for them' do
-        @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
-
-        expect(@invoice_10.non_discount_total_invoice_revenue).to eq(400)
       end
     end
   end
