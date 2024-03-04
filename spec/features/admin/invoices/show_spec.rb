@@ -115,7 +115,6 @@ RSpec.describe 'Admin Index Show', type: :feature do
 
       # As an admin, when I visit an admin invoice show page
       visit admin_invoice_path(@invoice_2)
-      save_and_open_page
       # Then I see the total revenue from this invoice (not including discounts)
       expect(page).to have_content("Total Revenue: $388.0")
       # And I see the total discounted revenue from this invoice which includes bulk discounts in the calculation
