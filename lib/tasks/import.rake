@@ -2,7 +2,6 @@ require 'csv'
 
 def import(file_path, model)
   CSV.foreach(file_path, headers: true) do |row|
-    require 'pry' ; binding.pry
     model.create!(row.to_hash)
   end
 end
@@ -20,6 +19,7 @@ namespace :csv_load do
     CSV.foreach(file_path, headers: true) do |row|
       Customer.create!(row.to_hash)
     end
+    ActiveRecord::Base.connection.reset_pk_sequence!('customers')
   end
 
   task :items => [:environment] do 
@@ -35,6 +35,7 @@ namespace :csv_load do
     CSV.foreach(file_path, headers: true) do |row|
       Invoice.create!(row.to_hash)
     end
+    ActiveRecord::Base.connection.reset_pk_sequence!('invoices')
   end
 
   task :transactions => [:environment] do 
