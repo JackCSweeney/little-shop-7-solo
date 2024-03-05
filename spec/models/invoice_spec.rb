@@ -167,6 +167,8 @@ RSpec.describe Invoice, type: :model do
 
     describe '#total_invoice_revenue_after_discount' do
       it 'returns the total revenue of an invoice including any discounts from all merchants included on an invoice' do
+        expect(@invoice_10.total_invoice_revenue_after_discount).to eq(24.0)
+
         @merchant_1.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
         @merchant_2.bulk_discounts.create!(quantity_thresh: 10, percentage: 0.10)
 
