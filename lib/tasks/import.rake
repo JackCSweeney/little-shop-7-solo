@@ -59,9 +59,9 @@ namespace :csv_load do
 
     tables.each do |table|
       Rake::Task["csv_load:#{table}"].invoke
+      ActiveRecord::Base.connection.reset_pk_sequence!("#{table}")
     end
 
-    Rake::Task["reset_sequences"].invoke
   end
 end
 
