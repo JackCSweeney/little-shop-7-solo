@@ -42,5 +42,33 @@ RSpec.describe 'Merchant Bulk Discounts New Page', type: :feature do
       expect(page).to have_field("quantity_thresh")
       expect(page).to have_field("percentage")
     end
+
+    it 'has a sad path flash message for for invalid percentage discounts for too high of a value' do
+      visit new_merchant_bulk_discount_path(@merch_1)
+
+      fill_in("quantity_thresh", with: 15)
+      fill_in("percentage", with: 1)
+      click_on "Save"
+      
+      within "#flash" do
+        expect(page).to have_content("Error: Percentage must be less than 1.0")
+      end
+      expect(page).to have_field("quantity_thresh")
+      expect(page).to have_field("percentage")
+    end
+
+    it 'has a sad path flash message for for invalid percentage discounts for too low of a value' do
+      visit new_merchant_bulk_discount_path(@merch_1)
+
+      fill_in("quantity_thresh", with: 15)
+      fill_in("percentage", with: 0)
+      click_on "Save"
+      
+      within "#flash" do
+        expect(page).to have_content("Error: Percentage must be greater than 0.0")
+      end
+      expect(page).to have_field("quantity_thresh")
+      expect(page).to have_field("percentage")
+    end
   end
 end
